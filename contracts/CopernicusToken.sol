@@ -12,6 +12,7 @@ contract CopernicusToken is Ownable, ERC721Full {
   uint256 public maxSupply;
   uint256 public tokenPrice;
   string public baseTokenUri;
+  address public trustedWallet;
 
   constructor(
     string memory _name,
@@ -24,6 +25,7 @@ contract CopernicusToken is Ownable, ERC721Full {
     maxSupply = _maxSupply;
     baseTokenUri = _baseTokenUri;
     tokenPrice = _tokenPrice;
+    trustedWallet = msg.sender;
 
     for(uint256 i = 0; i < 21; i++) {
       if(i < 9) {
@@ -41,4 +43,10 @@ contract CopernicusToken is Ownable, ERC721Full {
         ).strConcat(".json");
         // return baseTokenUri;
     }
+    
+  function buyToken(uint256 tokenId) external payable {
+     require(ownerOf(tokenId) == trustedWallet, "TOKEN ALREADY SOLD");
+     require(msg.value >= tokenPrice, "MSG_VALUE_TOO_LOW");
+     _transferFrom(trustedWallet, msg.sender, tokenId);
+   }
 }
